@@ -2,13 +2,11 @@ package startup
 
 import (
 	"fmt"
-	"github.com/tamararankovic/microservices_demo/catalogue_service/application"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/domain"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/infrastructure/api"
-	"github.com/tamararankovic/microservices_demo/catalogue_service/infrastructure/config"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/infrastructure/persistence"
+	"github.com/tamararankovic/microservices_demo/catalogue_service/startup/config"
 	catalogue "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -52,16 +50,16 @@ func (server *Server) initController() (*api.ProductController, error) {
 	return api.NewProductController(service), nil
 }
 
-func (server *Server) initService() (*application.ProductService, error) {
+func (server *Server) initService() (*domain.ProductService, error) {
 	store, err := server.initStore()
 	if err != nil {
 		return nil, err
 	}
-	service := application.NewProductService(store)
+	service := domain.NewProductService(store)
 	return service, nil
 }
 
-func (server *Server) initStore() (application.ProductStore, error) {
+func (server *Server) initStore() (domain.ProductStore, error) {
 	store, err := persistence.NewProductMongoDBStore(server.config.CatalogueDBHost, server.config.CatalogueDBPort)
 	if err != nil {
 		return nil, err
@@ -71,37 +69,4 @@ func (server *Server) initStore() (application.ProductStore, error) {
 		store.Insert(product)
 	}
 	return store, nil
-}
-
-var products = []*domain.Product{
-	{
-		Id:            primitive.NewObjectID(),
-		Name:          "name",
-		ClothingBrand: "brand",
-		Colors: []domain.Color{
-			{
-				Code: "R",
-				Name: "Red",
-			},
-			{
-				Code: "B",
-				Name: "Blue",
-			},
-		},
-	},
-	{
-		Id:            primitive.NewObjectID(),
-		Name:          "name2",
-		ClothingBrand: "brand2",
-		Colors: []domain.Color{
-			{
-				Code: "R",
-				Name: "Red",
-			},
-			{
-				Code: "G",
-				Name: "Green",
-			},
-		},
-	},
 }

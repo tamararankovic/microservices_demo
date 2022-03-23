@@ -2,13 +2,13 @@ package api
 
 import (
 	"context"
-	pb "github.com/tamararankovic/microservices_demo/common/proto/ordering_service"
-	"github.com/tamararankovic/microservices_demo/ordering_service/domain"
+	pb "github.com/tamararankovic/microservices_demo/common/proto/shipping_service"
+	"github.com/tamararankovic/microservices_demo/shipping_service/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type OrderController struct {
-	pb.UnimplementedOrderingServiceServer
+	pb.UnimplementedShippingServiceServer
 	service *domain.OrderService
 }
 

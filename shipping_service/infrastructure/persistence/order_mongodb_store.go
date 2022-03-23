@@ -2,14 +2,14 @@ package persistence
 
 import (
 	"context"
-	"github.com/tamararankovic/microservices_demo/ordering_service/domain"
+	"github.com/tamararankovic/microservices_demo/shipping_service/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const (
-	DATABASE   = "order"
+	DATABASE   = "shipping"
 	COLLECTION = "order"
 )
 

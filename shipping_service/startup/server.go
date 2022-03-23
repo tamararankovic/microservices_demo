@@ -2,11 +2,11 @@ package startup
 
 import (
 	"fmt"
-	ordering "github.com/tamararankovic/microservices_demo/common/proto/ordering_service"
-	"github.com/tamararankovic/microservices_demo/ordering_service/domain"
-	"github.com/tamararankovic/microservices_demo/ordering_service/infrastructure/api"
-	"github.com/tamararankovic/microservices_demo/ordering_service/infrastructure/persistence"
-	"github.com/tamararankovic/microservices_demo/ordering_service/startup/config"
+	shipping "github.com/tamararankovic/microservices_demo/common/proto/shipping_service"
+	"github.com/tamararankovic/microservices_demo/shipping_service/domain"
+	"github.com/tamararankovic/microservices_demo/shipping_service/infrastructure/api"
+	"github.com/tamararankovic/microservices_demo/shipping_service/infrastructure/persistence"
+	"github.com/tamararankovic/microservices_demo/shipping_service/startup/config"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -36,7 +36,7 @@ func (server *Server) startGrpcServer() {
 		log.Fatalf("failed to initialize: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	ordering.RegisterOrderingServiceServer(grpcServer, controller)
+	shipping.RegisterShippingServiceServer(grpcServer, controller)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
@@ -60,7 +60,7 @@ func (server *Server) initService() (*domain.OrderService, error) {
 }
 
 func (server *Server) initStore() (domain.OrderStore, error) {
-	store, err := persistence.NewOrderMongoDBStore(server.config.OrderingDBHost, server.config.OrderingDBPort)
+	store, err := persistence.NewOrderMongoDBStore(server.config.ShippingDBHost, server.config.ShippingDBPort)
 	if err != nil {
 		return nil, err
 	}

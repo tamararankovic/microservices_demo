@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"context"
-	"github.com/tamararankovic/microservices_demo/catalogue_service/application"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,7 +17,7 @@ type ProductMongoDBStore struct {
 	products *mongo.Collection
 }
 
-func NewProductMongoDBStore(host, port string) (application.ProductStore, error) {
+func NewProductMongoDBStore(host, port string) (domain.ProductStore, error) {
 	client, err := GetClient(host, port)
 	if err != nil {
 		return nil, err

@@ -1,8 +1,8 @@
 package main
 
 import (
-	cfg "github.com/tamararankovic/microservices_demo/ordering_service/infrastructure/config"
 	"github.com/tamararankovic/microservices_demo/ordering_service/startup"
+	cfg "github.com/tamararankovic/microservices_demo/ordering_service/startup/config"
 )
 
 func main() {

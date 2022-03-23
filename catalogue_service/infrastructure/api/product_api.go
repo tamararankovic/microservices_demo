@@ -2,17 +2,17 @@ package api
 
 import (
 	"context"
-	"github.com/tamararankovic/microservices_demo/catalogue_service/application"
+	"github.com/tamararankovic/microservices_demo/catalogue_service/domain"
 	pb "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ProductController struct {
 	pb.UnimplementedCatalogueServiceServer
-	service *application.ProductService
+	service *domain.ProductService
 }
 
-func NewProductController(service *application.ProductService) *ProductController {
+func NewProductController(service *domain.ProductService) *ProductController {
 	return &ProductController{
 		service: service,
 	}

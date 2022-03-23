@@ -1,7 +1,6 @@
-package application
+package domain
 
 import (
-	"github.com/tamararankovic/microservices_demo/ordering_service/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -15,10 +14,10 @@ func NewOrderService(store OrderStore) *OrderService {
 	}
 }
 
-func (service *OrderService) Get(id primitive.ObjectID) (*domain.Order, error) {
+func (service *OrderService) Get(id primitive.ObjectID) (*Order, error) {
 	return service.store.Get(id)
 }
 
-func (service *OrderService) GetAll() ([]*domain.Order, error) {
+func (service *OrderService) GetAll() ([]*Order, error) {
 	return service.store.GetAll()
 }

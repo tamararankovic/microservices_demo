@@ -1,7 +1,6 @@
-package application
+package domain
 
 import (
-	"github.com/tamararankovic/microservices_demo/catalogue_service/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -15,10 +14,10 @@ func NewProductService(store ProductStore) *ProductService {
 	}
 }
 
-func (service *ProductService) Get(id primitive.ObjectID) (*domain.Product, error) {
+func (service *ProductService) Get(id primitive.ObjectID) (*Product, error) {
 	return service.store.Get(id)
 }
 
-func (service *ProductService) GetAll() ([]*domain.Product, error) {
+func (service *ProductService) GetAll() ([]*Product, error) {
 	return service.store.GetAll()
 }
