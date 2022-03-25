@@ -5,7 +5,7 @@ import (
 	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
 )
 
-type NATSPublisher struct {
+type Publisher struct {
 	conn    *nats.EncodedConn
 	subject string
 }
@@ -16,13 +16,13 @@ func NewNATSPublisher(host, port, user, password, subject string) (saga.Publishe
 	if err != nil {
 		return nil, err
 	}
-	return &NATSPublisher{
+	return &Publisher{
 		conn:    encConn,
 		subject: subject,
 	}, nil
 }
 
-func (p *NATSPublisher) Publish(message interface{}) error {
+func (p *Publisher) Publish(message interface{}) error {
 	err := p.conn.Publish(p.subject, message)
 	if err != nil {
 		return err

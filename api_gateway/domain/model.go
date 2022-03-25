@@ -3,8 +3,11 @@ package domain
 import "time"
 
 type Product struct {
-	Name  string
-	Color string
+	Id            string
+	Name          string
+	ClothingBrand string
+	ColorCode     string
+	ColorName     string
 }
 
 type OrderItem struct {
