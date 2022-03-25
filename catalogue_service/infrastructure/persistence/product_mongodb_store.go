@@ -17,16 +17,11 @@ type ProductMongoDBStore struct {
 	products *mongo.Collection
 }
 
-func NewProductMongoDBStore(host, port string) (domain.ProductStore, error) {
-	client, err := GetClient(host, port)
-	if err != nil {
-		return nil, err
-	}
+func NewProductMongoDBStore(client *mongo.Client) domain.ProductStore {
 	products := client.Database(DATABASE).Collection(COLLECTION)
-	store := &ProductMongoDBStore{
+	return &ProductMongoDBStore{
 		products: products,
 	}
-	return store, nil
 }
 
 func (store *ProductMongoDBStore) Get(id primitive.ObjectID) (*domain.Product, error) {

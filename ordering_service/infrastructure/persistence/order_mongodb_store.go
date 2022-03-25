@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"errors"
 	"github.com/tamararankovic/microservices_demo/ordering_service/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,16 +18,11 @@ type OrderMongoDBStore struct {
 	orders *mongo.Collection
 }
 
-func NewOrderMongoDBStore(host, port string) (domain.OrderStore, error) {
-	client, err := GetClient(host, port)
-	if err != nil {
-		return nil, err
-	}
+func NewOrderMongoDBStore(client *mongo.Client) domain.OrderStore {
 	orders := client.Database(DATABASE).Collection(COLLECTION)
-	store := &OrderMongoDBStore{
+	return &OrderMongoDBStore{
 		orders: orders,
 	}
-	return store, nil
 }
 
 func (store *OrderMongoDBStore) Get(id primitive.ObjectID) (*domain.Order, error) {
@@ -39,17 +35,35 @@ func (store *OrderMongoDBStore) GetAll() ([]*domain.Order, error) {
 	return store.filter(filter)
 }
 
-func (store *OrderMongoDBStore) Insert(Order *domain.Order) error {
-	result, err := store.orders.InsertOne(context.TODO(), Order)
+func (store *OrderMongoDBStore) Insert(order *domain.Order) error {
+	order.Id = primitive.NewObjectID()
+	result, err := store.orders.InsertOne(context.TODO(), order)
 	if err != nil {
 		return err
 	}
-	Order.Id = result.InsertedID.(primitive.ObjectID)
+	order.Id = result.InsertedID.(primitive.ObjectID)
 	return nil
 }
 
 func (store *OrderMongoDBStore) DeleteAll() {
 	store.orders.DeleteMany(context.TODO(), bson.D{{}})
+}
+
+func (store *OrderMongoDBStore) UpdateStatus(order *domain.Order) error {
+	result, err := store.orders.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": order.Id},
+		bson.D{
+			{"$set", bson.D{{"status", order.Status}}},
+		},
+	)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount != 1 {
+		return errors.New("one document should've been updated")
+	}
+	return nil
 }
 
 func (store *OrderMongoDBStore) filter(filter interface{}) ([]*domain.Order, error) {

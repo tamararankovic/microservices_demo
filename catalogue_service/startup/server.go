@@ -2,11 +2,13 @@ package startup
 
 import (
 	"fmt"
+	"github.com/tamararankovic/microservices_demo/catalogue_service/application"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/domain"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/infrastructure/api"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/infrastructure/persistence"
 	"github.com/tamararankovic/microservices_demo/catalogue_service/startup/config"
 	catalogue "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
+	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -23,50 +25,52 @@ func NewServer(config *config.Config) *Server {
 }
 
 func (server *Server) Start() {
-	server.startGrpcServer()
+	mongoClient := server.initMongoClient()
+	productStore := server.initProductStore(mongoClient)
+
+	productService := server.initProductService(productStore)
+
+	productHandler := server.initProductHandler(productService)
+
+	server.startGrpcServer(productHandler)
 }
 
-func (server *Server) startGrpcServer() {
+func (server *Server) initMongoClient() *mongo.Client {
+	client, err := persistence.GetClient(server.config.CatalogueDBHost, server.config.CatalogueDBPort)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return client
+}
+
+func (server *Server) initProductStore(client *mongo.Client) domain.ProductStore {
+	store := persistence.NewProductMongoDBStore(client)
+	store.DeleteAll()
+	for _, product := range products {
+		err := store.Insert(product)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return store
+}
+
+func (server *Server) initProductService(store domain.ProductStore) *application.ProductService {
+	return application.NewProductService(store)
+}
+
+func (server *Server) initProductHandler(service *application.ProductService) *api.ProductHandler {
+	return api.NewProductHandler(service)
+}
+
+func (server *Server) startGrpcServer(productHandler *api.ProductHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	controller, err := server.initController()
-	if err != nil {
-		log.Fatalf("failed to initialize: %v", err)
-	}
 	grpcServer := grpc.NewServer()
-	catalogue.RegisterCatalogueServiceServer(grpcServer, controller)
+	catalogue.RegisterCatalogueServiceServer(grpcServer, productHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
-}
-
-func (server *Server) initController() (*api.ProductController, error) {
-	service, err := server.initService()
-	if err != nil {
-		return nil, err
-	}
-	return api.NewProductController(service), nil
-}
-
-func (server *Server) initService() (*domain.ProductService, error) {
-	store, err := server.initStore()
-	if err != nil {
-		return nil, err
-	}
-	service := domain.NewProductService(store)
-	return service, nil
-}
-
-func (server *Server) initStore() (domain.ProductStore, error) {
-	store, err := persistence.NewProductMongoDBStore(server.config.CatalogueDBHost, server.config.CatalogueDBPort)
-	if err != nil {
-		return nil, err
-	}
-	store.DeleteAll()
-	for _, product := range products {
-		store.Insert(product)
-	}
-	return store, nil
 }

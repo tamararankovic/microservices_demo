@@ -7,4 +7,5 @@ type OrderStore interface {
 	GetAll() ([]*Order, error)
 	Insert(product *Order) error
 	DeleteAll()
+	UpdateStatus(order *Order) error
 }

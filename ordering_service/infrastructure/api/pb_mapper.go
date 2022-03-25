@@ -28,6 +28,25 @@ func mapOrder(order *domain.Order) *pb.Order {
 	return orderPb
 }
 
+func mapNewOrder(orderPb *pb.NewOrder) *domain.Order {
+	order := &domain.Order{
+		Items: make([]domain.OrderItem, 0),
+	}
+	for _, itemPb := range orderPb.Items {
+		item := domain.OrderItem{
+			Product: domain.Product{
+				Id: itemPb.Product.Id,
+				Color: domain.Color{
+					Code: itemPb.Product.Color.Code,
+				},
+			},
+			Quantity: uint16(itemPb.Quantity),
+		}
+		order.Items = append(order.Items, item)
+	}
+	return order
+}
+
 func mapStatus(status domain.OrderStatus) pb.Order_OrderStatus {
 	switch status {
 	case domain.PendingApproval:

@@ -2,29 +2,29 @@ package api
 
 import (
 	"context"
-	"github.com/tamararankovic/microservices_demo/catalogue_service/domain"
+	"github.com/tamararankovic/microservices_demo/catalogue_service/application"
 	pb "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type ProductController struct {
+type ProductHandler struct {
 	pb.UnimplementedCatalogueServiceServer
-	service *domain.ProductService
+	service *application.ProductService
 }
 
-func NewProductController(service *domain.ProductService) *ProductController {
-	return &ProductController{
+func NewProductHandler(service *application.ProductService) *ProductHandler {
+	return &ProductHandler{
 		service: service,
 	}
 }
 
-func (controller *ProductController) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
+func (handler *ProductHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
-	product, err := controller.service.Get(objectId)
+	product, err := handler.service.Get(objectId)
 	if err != nil {
 		return nil, err
 	}
@@ -35,8 +35,8 @@ func (controller *ProductController) Get(ctx context.Context, request *pb.GetReq
 	return response, nil
 }
 
-func (controller *ProductController) GetAll(ctx context.Context, request *pb.GetAllRequest) (*pb.GetAllResponse, error) {
-	products, err := controller.service.GetAll()
+func (handler *ProductHandler) GetAll(ctx context.Context, request *pb.GetAllRequest) (*pb.GetAllResponse, error) {
+	products, err := handler.service.GetAll()
 	if err != nil {
 		return nil, err
 	}

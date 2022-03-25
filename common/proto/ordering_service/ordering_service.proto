@@ -18,6 +18,12 @@ service OrderingService{
 			get: "/order"
 		};
         }
+        rpc CreateOrder(CreateOrderRequest) returns(CreateOrderResponse) {
+                option (google.api.http) = {
+                        post: "/order"
+                        body: "order"
+                };
+        }
 }
 
 message GetRequest {
@@ -33,6 +39,19 @@ message GetAllRequest {
 
 message GetAllResponse {
         repeated Order orders = 1;
+}
+
+message CreateOrderRequest {
+        NewOrder order = 1;
+}
+
+message CreateOrderResponse {
+        Order order = 1;
+}
+
+message NewOrder {
+        repeated OrderItem items = 1;
+        string address = 2;
 }
 
 message Order {

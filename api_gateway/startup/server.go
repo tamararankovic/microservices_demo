@@ -7,6 +7,7 @@ import (
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/api"
 	config2 "github.com/tamararankovic/microservices_demo/api_gateway/startup/config"
 	catalogueGw "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
+	inventoryGw "github.com/tamararankovic/microservices_demo/common/proto/inventory_service"
 	orderingGw "github.com/tamararankovic/microservices_demo/common/proto/ordering_service"
 	shippingGw "github.com/tamararankovic/microservices_demo/common/proto/shipping_service"
 	"google.golang.org/grpc"
@@ -44,6 +45,11 @@ func (server *Server) initHandlers() {
 	}
 	shippingEmdpoint := fmt.Sprintf("%s:%s", server.config.ShippingHost, server.config.ShippingPort)
 	err = shippingGw.RegisterShippingServiceHandlerFromEndpoint(context.TODO(), server.mux, shippingEmdpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+	inventoryEmdpoint := fmt.Sprintf("%s:%s", server.config.InventoryHost, server.config.InventoryPort)
+	err = inventoryGw.RegisterInventoryServiceHandlerFromEndpoint(context.TODO(), server.mux, inventoryEmdpoint, opts)
 	if err != nil {
 		panic(err)
 	}
