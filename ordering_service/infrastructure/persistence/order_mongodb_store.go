@@ -36,7 +36,9 @@ func (store *OrderMongoDBStore) GetAll() ([]*domain.Order, error) {
 }
 
 func (store *OrderMongoDBStore) Insert(order *domain.Order) error {
-	order.Id = primitive.NewObjectID()
+	if order.Id.IsZero() {
+		order.Id = primitive.NewObjectID()
+	}
 	result, err := store.orders.InsertOne(context.TODO(), order)
 	if err != nil {
 		return err
